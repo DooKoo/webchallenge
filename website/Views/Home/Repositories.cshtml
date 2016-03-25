@@ -1,0 +1,6 @@
+﻿<div id="content"></div>
+<script type="text/javascript">
+    $.ajax('@Url.Action("GetRepositories", "Api")').done(function (data) {
+        $('#content').html(data);
+    });
+</script>

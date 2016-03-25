@@ -1,0 +1,218 @@
+﻿@using Newtonsoft.Json.Linq
+@model JObject
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<div>
+    <h1 class="page-header"><a href="@Model["HtmlUrl"]">@Model["FullName"]</a></h1>
+    <h2><span class="glyphicon glyphicon-star"></span><span>&ensp;@Model["StargazersCount"]</span></h2>
+    <h2>Мова: @Model["Language"]</h2>
+</div>
+<br/>
+<br />
+<br />
+<div class="pull-right" style="padding-right:10px">
+    Побудувати діаграми за останній @Html.DropDownList("period", new List<SelectListItem>
+{
+    new SelectListItem(){
+        Text = "тиждень",
+        Value = "0"
+    },
+    new SelectListItem(){
+            Text = "місяць",
+            Value = "1"
+    }
+})
+    <br/>
+</div>
+<div id="stars" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br/>
+<div id="contributors" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<br />
+<div id="commits" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+<script type="text/javascript">
+    $(function (id) {
+        update(0);
+        $("#period").change(function () {
+            var val = $(this).children(":selected").attr("value");
+            update(val);
+        });
+    });
+
+    function update(id) {
+        $.getJSON('@Url.Action("GetStargazers", "Api", new {name = Model["FullName"]})&type=' + id, function (data) {
+
+            $('#stars').highcharts({
+                chart: {
+                    zoomType: 'x'
+                },
+                title: {
+                    text: 'Зірочок'
+                },
+                subtitle: {
+                    text: document.ontouchstart === undefined ?
+                            'Натисніть та перетягуйте на графіку для збільшення' : 'Натисніть на графік для збільшення'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    categories: data.days
+                },
+                yAxis: {
+                    title: {
+                        text: 'Зірочок'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    area: {
+                        fillColor: {
+                            linearGradient: {
+                                x1: 0,
+                                y1: 0,
+                                x2: 0,
+                                y2: 1
+                            },
+                            stops: [
+                                [0, Highcharts.getOptions().colors[0]],
+                                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                            ]
+                        },
+                        marker: {
+                            radius: 2
+                        },
+                        lineWidth: 1,
+                        states: {
+                            hover: {
+                                lineWidth: 1
+                            }
+                        },
+                        threshold: null
+                    }
+                },
+
+                series: [{
+                    type: 'area',
+                    name: 'Stars',
+                    data: data.stars
+                }]
+            });
+        });//stars
+        $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.json&callback=?', function (data) {
+
+            $('#contributors').highcharts({
+                chart: {
+                    zoomType: 'x'
+                },
+                title: {
+                    text: 'Унікальних контриб\'юторів'
+                },
+                subtitle: {
+                    text: document.ontouchstart === undefined ?
+                            'Натисніть та перетягуйте на графіку для збільшення' : 'Натисніть на графік для збільшення'
+                },
+                xAxis: {
+                    type: 'datetime'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Унікальних контриб\'юторів'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    area: {
+                        fillColor: {
+                            linearGradient: {
+                                x1: 0,
+                                y1: 0,
+                                x2: 0,
+                                y2: 1
+                            },
+                            stops: [
+                                [0, Highcharts.getOptions().colors[0]],
+                                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                            ]
+                        },
+                        marker: {
+                            radius: 2
+                        },
+                        lineWidth: 1,
+                        states: {
+                            hover: {
+                                lineWidth: 1
+                            }
+                        },
+                        threshold: null
+                    }
+                },
+
+                series: [{
+                    type: 'area',
+                    name: 'Stars',
+                    data: data
+                }]
+            });
+        });//contributors
+        $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.json&callback=?', function (data) {
+
+            $('#commits').highcharts({
+                chart: {
+                    zoomType: 'x'
+                },
+                title: {
+                    text: 'Комітів'
+                },
+                subtitle: {
+                    text: document.ontouchstart === undefined ?
+                            'Натисніть та перетягуйте на графіку для збільшення' : 'Натисніть на графік для збільшення'
+                },
+                xAxis: {
+                    type: 'datetime'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Комітів'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                plotOptions: {
+                    area: {
+                        fillColor: {
+                            linearGradient: {
+                                x1: 0,
+                                y1: 0,
+                                x2: 0,
+                                y2: 1
+                            },
+                            stops: [
+                                [0, Highcharts.getOptions().colors[0]],
+                                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                            ]
+                        },
+                        marker: {
+                            radius: 2
+                        },
+                        lineWidth: 1,
+                        states: {
+                            hover: {
+                                lineWidth: 1
+                            }
+                        },
+                        threshold: null
+                    }
+                },
+
+                series: [{
+                    type: 'area',
+                    name: 'Stars',
+                    data: data
+                }]
+            });
+        });//commits
+    }
+</script>
