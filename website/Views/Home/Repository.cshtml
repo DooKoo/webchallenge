@@ -156,7 +156,7 @@
                 }]
             });
         });//contributors
-        $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=usdeur.json&callback=?', function (data) {
+        $.getJSON('@Url.Action("GetCommits", "Api", new {name = Model["FullName"]})&type=' + id, function (data) {
 
             $('#commits').highcharts({
                 chart: {

@@ -53,7 +53,7 @@ namespace website.Utils
             return JArray.FromObject(stargazersFiltered);
         }
 
-        public static async Task<JArray> GetContributors(string name, DateTime from, DateTime to)
+        public static async Task<JArray> GetPushes(string name, DateTime from, DateTime to)
         {
             if (from >= to)
                 return new JArray();

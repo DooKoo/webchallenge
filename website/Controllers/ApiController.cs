@@ -52,6 +52,31 @@ namespace website.Controllers
 
         }
         */
+
+        public async Task<string> GetCommits(string name, int type)
+        {
+            JArray commits = new JArray();
+            if (type == 0)
+            {
+                commits = await CacheService.GetPushes(name, DateTime.Now.AddDays(-7), DateTime.Now);
+            }
+            else if (type == 1)
+            {
+                commits = await CacheService.GetPushes(name, DateTime.Now.AddMonths(-1), DateTime.Now);
+            }
+            var result = commits.GroupBy(star => DateTime.Parse(star["CreatedAt"].ToString()).ToShortDateString())
+                .Select(group => new
+                {
+                    date = group.Key,
+                    stars = group.Count()
+                });
+
+            return JObject.FromObject(new
+            {
+                days = result.Select(r => r.date).ToArray(),
+                commits = result.Select(r => r.stars).ToArray()
+            }).ToString();
+        }
         public async Task<string> RateLimits()
         {
             var limits = await GitHubClientSingelton.Client.Miscellaneous.GetRateLimits();

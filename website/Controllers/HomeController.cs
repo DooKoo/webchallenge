@@ -16,29 +16,6 @@ namespace website.Controllers
 {
     public class HomeController : Controller
     {
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            base.OnActionExecuted(filterContext);
-            
-            /*
-            try
-            {
-                // The following requests retrieves all of the user's repositories and
-                // requires that the user be logged in to work.
-                var repositories = GitHubClientSingelton.Client.Repository.GetAllForCurrent().Result;
-                //var model = new IndexViewModel(repositories);
-                
-            }
-            catch (AuthorizationException)
-            {
-                // Either the accessToken is null or it's invalid. This redirects
-                // to the GitHub OAuth login page. That page will redirect back to the
-                // Authorize action.
-                //Redirect(GetOauthLoginUrl());
-            }
-             * */
-        }
-        
         [HttpGet]
         public async Task<ActionResult> Index()
         {
@@ -53,9 +30,8 @@ namespace website.Controllers
 
         [HttpGet]
         public async Task<ActionResult> Repositories()
-        {                     
-            var limits = await GitHubClientSingelton.Client.Miscellaneous.GetRateLimits();
-            return View();
+        {                  
+           return View();
         }
 
         [HttpGet]
@@ -86,7 +62,7 @@ namespace website.Controllers
                 var token = await GitHubClientSingelton.Client.Oauth.CreateAccessToken(
                     new OauthTokenRequest(GitHubClientSingelton.ClientId, GitHubClientSingelton.ClientSecret, code)
                     {
-                        RedirectUri = new Uri("http://webchallengeapp.azurewebsites.net/Home/Authorize")//TODO:Change url
+                        RedirectUri = new Uri("http://webchallengeapp.azurewebsites.net/Home/Authorize")
                     });
                 Session["OAuthToken"] = token.AccessToken;
                 GitHubClientSingelton.Client.Credentials = new Credentials(token.AccessToken);
