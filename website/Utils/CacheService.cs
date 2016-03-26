@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 namespace website.Utils
 {
     /// <summary>
-    /// Data chacher
+    /// Data cacher
+    /// Data updating every hour
     /// </summary>
     public static class CacheService
     {
@@ -26,7 +27,39 @@ namespace website.Utils
         private static Dictionary<string, IReadOnlyList<GitHubCommit>> WeekCommitsDictionary = 
             new Dictionary<string, IReadOnlyList<GitHubCommit>>();
 
-        private static JArray Repositories;
+        private static Dictionary<string, DateTime> ExpirationTimesDictionary = 
+            new Dictionary<string, DateTime>();
+
+        /// <summary>
+        /// Add expiration time to dictionary
+        /// </summary>
+        /// <param name="name">object key</param>
+        /// <param name="type">object type</param>
+        private static void AddExpirationTime(string name, Type type, string aditionalDesc = "")
+        {
+            string key = String.Format("{0}_{1}_{2}",type.Name, name, aditionalDesc);
+            ExpirationTimesDictionary[key] = DateTime.Now.AddHours(1);
+        }
+
+        /// <summary>
+        /// Checking data expiration
+        /// </summary>
+        /// <param name="name">object key</param>
+        /// <param name="type">object type</param>
+        /// <returns>returns false if data expired and true if valid</returns>
+        private static bool IsDataValid(string name, Type type, string aditionalDesc = "")
+        {
+            string key = String.Format("{0}_{1}_{2}",type.Name, name, aditionalDesc);
+            if(!ExpirationTimesDictionary.Keys.Contains(key))
+            {
+                return false;
+            }
+
+            if (ExpirationTimesDictionary[key] < DateTime.Now)
+                return false;
+
+            return true;
+        }
 
         /// <summary>
         /// Return cached details of repository
@@ -35,23 +68,14 @@ namespace website.Utils
         /// <returns>Repository in json format</returns>
         public static async Task<JObject> GetRepositoryDetails(string name)
         {
-            if (!RepositoryDetailsDictionary.Keys.Contains(name))
+            if (!IsDataValid(name, typeof(Repository)))
             {
-                var repo = await GitHubWrapper.GetRepository(name);
-                RepositoryDetailsDictionary.Add(name, repo);
+                RepositoryDetailsDictionary[name] = await GitHubWrapper.GetRepository(name);
+                AddExpirationTime(name, typeof(Repository));
             }
 
             return JObject.FromObject(RepositoryDetailsDictionary[name]);
-        }
-
-        public static async Task<JArray> GetRepositories()
-        {
-            if (Repositories == null)
-            {
-                
-            }
-            return Repositories;
-        }
+        }        
 
         /// <summary>
         /// Return chached stargazers
@@ -65,9 +89,10 @@ namespace website.Utils
             if (from >= to)
                 return new JArray();
 
-            if (!StargazersDictionary.Keys.Contains(name))
+            if (!IsDataValid(name, typeof(UserStar)))
             {
-                StargazersDictionary.Add(name, await GitHubWrapper.GetStargazers(name));
+                StargazersDictionary[name] = await GitHubWrapper.GetStargazers(name);
+                AddExpirationTime(name, typeof(UserStar));
             }
 
             var stargazers = StargazersDictionary[name];
@@ -88,21 +113,16 @@ namespace website.Utils
             Dictionary<string, IReadOnlyList<GitHubCommit>> commitsDictionary;
 
             if(type == 0)
-            {
                 commitsDictionary = WeekCommitsDictionary;
-            }
             else if(type == 1)
-            {
                 commitsDictionary = MonthCommitsDictionary;
-            }
             else
-            {
                 return new JArray();
-            }
             
-            if (!commitsDictionary.Keys.Contains(name))
+            if (!IsDataValid(name, typeof(GitHubCommit), type.ToString()))
             {
-                commitsDictionary.Add(name, await GitHubWrapper.GetCommits(name, type));
+                commitsDictionary[name] = await GitHubWrapper.GetCommits(name, type);
+                AddExpirationTime(name, typeof(GitHubCommit), type.ToString());
             }
             var commits = commitsDictionary[name];
             

@@ -17,21 +17,15 @@ namespace website.Controllers
     public class HomeController : Controller
     {
         [HttpGet]
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            /*
-            var searchRequest = new SearchRepositoriesRequest();
-            searchRequest.Updated = new DateRange(DateTime.Now.AddMonths(-1), DateTime.Now);
-            searchRequest.PerPage = 500;
-            var result = await GitHubClientSingelton.Client.Search.SearchRepo(searchRequest);
-            */
             return View();
         }
 
         [HttpGet]
         public async Task<ActionResult> Repositories()
-        {                  
-           return View();
+        {  
+            return View();
         }
 
         [HttpGet]

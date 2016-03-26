@@ -14,7 +14,7 @@ namespace website.Controllers
     {
         public string GetRepositories()
         {
-            return CacheService.GetRepositories().ToString();
+            return "";
         }
                 
         public string GetOrganizations()
