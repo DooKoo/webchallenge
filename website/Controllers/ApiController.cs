@@ -14,7 +14,7 @@ namespace website.Controllers
     {
         public string GetRepositories()
         {
-            return CacheService.GetRepositories().ToString(); ;
+            return CacheService.GetRepositories().ToString();
         }
                 
         public string GetOrganizations()
@@ -34,34 +34,30 @@ namespace website.Controllers
                 stargazers = await CacheService.GetStargazers(name, DateTime.Now.AddMonths(-1), DateTime.Now);
             }
 
-            var result = stargazers.GroupBy(star => DateTime.Parse(star["StarredAt"].ToString()).ToShortDateString())
+            var result = stargazers.GroupBy(star => 
+                DateTime.Parse(star["StarredAt"].ToString()).ToShortDateString())
                 .Select(group => new
                 {
                     date=group.Key,
                     stars=group.Count()
-                });
+                }).OrderBy(x => DateTime.Parse(x.date));
 
             return JObject.FromObject(new { 
-                days=result.Select(r => r.date).ToArray(),
-                stars=result.Select(r => r.stars).ToArray()
+                days= result.Select(r => r.date).ToArray(),
+                stars= result.Select(r => r.stars).ToArray()
             }).ToString();
         }
-        /*
-        public async Task<string> GetContributors(string name, int type)
-        {
-
-        }
-        */
 
         public async Task<string> GetCommits(string name, int type)
         {
             JArray commits = await CacheService.GetCommits(name, type);
-            var result = commits.GroupBy(commit => DateTime.Parse(commit["Commit"]["Author"]["Date"].ToString()).ToShortDateString())
+            var result = commits.GroupBy(commit => 
+                DateTime.Parse(commit["Commit"]["Committer"]["Date"].ToString()).ToShortDateString())
                 .Select(group => new
                 {
                     date = group.Key,
                     commits = group.Count()
-                }).OrderBy(i => i.date);
+                }).OrderBy(x => DateTime.Parse(x.date));
 
             return JObject.FromObject(new
             {
@@ -69,6 +65,26 @@ namespace website.Controllers
                 commits = result.Select(r => r.commits).ToArray()
             }).ToString();
         }
+
+        public async Task<string> GetContributors(string name, int type)
+        {
+            JArray commits = await CacheService.GetCommits(name, type);
+            var result = commits.GroupBy(commit => 
+                DateTime.Parse(commit["Commit"]["Committer"]["Date"].ToString()).ToShortDateString())
+                .Select(group => new
+                {
+                    date = group.Key,
+                    contributors = group.ToList().GroupBy(commit => 
+                        commit["Committer"]["Id"]).Count()
+                }).OrderBy(x => DateTime.Parse(x.date));
+
+            return JObject.FromObject(new
+            {
+                days = result.Select(r => r.date).ToArray(),
+                contributors = result.Select(r => r.contributors).ToArray()
+            }).ToString();
+        }
+
         public async Task<string> RateLimits()
         {
             var limits = await GitHubClientSingelton.Client.Miscellaneous.GetRateLimits();

@@ -9,14 +9,30 @@ using System.Threading.Tasks;
 
 namespace website.Utils
 {
+    /// <summary>
+    /// Data chacher
+    /// </summary>
     public static class CacheService
     {
-        private static Dictionary<string, Repository> RepositoryDetailsDictionary = new Dictionary<string, Repository>();
-        private static Dictionary<string, IReadOnlyList<UserStar>> StargazersDictionary = new Dictionary<string, IReadOnlyList<UserStar>>();
-        private static Dictionary<string, IReadOnlyList<GitHubCommit>> MonthCommitsDictionary = new Dictionary<string, IReadOnlyList<GitHubCommit>>();
-        private static Dictionary<string, IReadOnlyList<GitHubCommit>> WeekCommitsDictionary = new Dictionary<string, IReadOnlyList<GitHubCommit>>();
+        private static Dictionary<string, Repository> RepositoryDetailsDictionary = 
+            new Dictionary<string, Repository>();
+
+        private static Dictionary<string, IReadOnlyList<UserStar>> StargazersDictionary = 
+            new Dictionary<string, IReadOnlyList<UserStar>>();
+
+        private static Dictionary<string, IReadOnlyList<GitHubCommit>> MonthCommitsDictionary = 
+            new Dictionary<string, IReadOnlyList<GitHubCommit>>();
+
+        private static Dictionary<string, IReadOnlyList<GitHubCommit>> WeekCommitsDictionary = 
+            new Dictionary<string, IReadOnlyList<GitHubCommit>>();
+
         private static JArray Repositories;
 
+        /// <summary>
+        /// Return cached details of repository
+        /// </summary>
+        /// <param name="name">Name of repository</param>
+        /// <returns>Repository in json format</returns>
         public static async Task<JObject> GetRepositoryDetails(string name)
         {
             if (!RepositoryDetailsDictionary.Keys.Contains(name))
@@ -37,6 +53,13 @@ namespace website.Utils
             return Repositories;
         }
 
+        /// <summary>
+        /// Return chached stargazers
+        /// </summary>
+        /// <param name="name">Name of repository</param>
+        /// <param name="from">Minimal date of stargazing</param>
+        /// <param name="to">Maximal date of stargazing</param>
+        /// <returns>Stargazers of repository on json format</returns>
         public static async Task<JArray> GetStargazers(string name, DateTime from, DateTime to)
         {
             if (from >= to)
@@ -55,11 +78,11 @@ namespace website.Utils
         }
 
         /// <summary>
-        /// return cached commits
+        /// Return cached commits
         /// </summary>
-        /// <param name="name">name of the repository</param>
-        /// <param name="type">describe period: 0 - weekly commits, 1 - monthly commits</param>
-        /// <returns></returns>
+        /// <param name="name">Name of the repository</param>
+        /// <param name="type">Describe period: 0 - weekly commits, 1 - monthly commits</param>
+        /// <returns>Commits of repository on json format</returns>
         public static async Task<JArray> GetCommits(string name, int type)
         {
             Dictionary<string, IReadOnlyList<GitHubCommit>> commitsDictionary;
@@ -84,6 +107,6 @@ namespace website.Utils
             var commits = commitsDictionary[name];
             
             return JArray.FromObject(commits);
-        }
+        }        
     }
 }

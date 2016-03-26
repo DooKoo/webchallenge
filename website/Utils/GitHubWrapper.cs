@@ -22,6 +22,11 @@ namespace website.Utils
             return repository;
         }
 
+        /// <summary>
+        /// Return all stargazers of repository
+        /// </summary>
+        /// <param name="name">Name of repository</param>
+        /// <returns>List of stargazers</returns>
         public static async Task<IReadOnlyList<UserStar>> GetStargazers(string name)
         {
             var splitted = name.Split('/');
@@ -38,9 +43,9 @@ namespace website.Utils
         /// <summary>
         /// Return commits by period
         /// </summary>
-        /// <param name="name">name of the repository</param>
-        /// <param name="type">describe period: 0 - weekly commits, 1 - monthly commits</param>
-        /// <returns></returns>
+        /// <param name="name">Name of the repository</param>
+        /// <param name="type">Describe period: 0 - weekly commits, 1 - monthly commits</param>
+        /// <returns>List of commits</returns>
         public static async Task<IReadOnlyList<GitHubCommit>> GetCommits(string name, int type)
         {
             var splitted = name.Split('/');
@@ -48,12 +53,11 @@ namespace website.Utils
             if (splitted.Length != 2)
                 return new List<GitHubCommit>();
 
-
-            var commits = await GitHubClientSingelton.Client.Repository.Commit.GetAll(splitted[0], splitted[1],
-            new CommitRequest()
+            var request = new CommitRequest()
             {
                 Since = type == 0 ? DateTime.Now.AddDays(-7) : DateTime.Now.AddMonths(-1)
-            });
+            };
+            var commits = await GitHubClientSingelton.Client.Repository.Commit.GetAll(splitted[0], splitted[1],request);
 
             return commits;
         }
