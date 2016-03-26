@@ -170,7 +170,8 @@
                             'Натисніть та перетягуйте на графіку для збільшення' : 'Натисніть на графік для збільшення'
                 },
                 xAxis: {
-                    type: 'datetime'
+                    type: 'datetime',
+                    categories: data.days
                 },
                 yAxis: {
                     title: {
@@ -210,7 +211,7 @@
                 series: [{
                     type: 'area',
                     name: 'Stars',
-                    data: data
+                    data: data.commits
                 }]
             });
         });//commits
