@@ -55,26 +55,18 @@ namespace website.Controllers
 
         public async Task<string> GetCommits(string name, int type)
         {
-            JArray commits = new JArray();
-            if (type == 0)
-            {
-                commits = await CacheService.GetPushes(name, DateTime.Now.AddDays(-7), DateTime.Now);
-            }
-            else if (type == 1)
-            {
-                commits = await CacheService.GetPushes(name, DateTime.Now.AddMonths(-1), DateTime.Now);
-            }
-            var result = commits.GroupBy(star => DateTime.Parse(star["CreatedAt"].ToString()).ToShortDateString())
+            JArray commits = await CacheService.GetCommits(name, type);
+            var result = commits.GroupBy(commit => DateTime.Parse(commit["Commit"]["Author"]["Date"].ToString()).ToShortDateString())
                 .Select(group => new
                 {
                     date = group.Key,
-                    stars = group.Count()
-                });
+                    commits = group.Count()
+                }).OrderBy(i => i.date);
 
             return JObject.FromObject(new
             {
                 days = result.Select(r => r.date).ToArray(),
-                commits = result.Select(r => r.stars).ToArray()
+                commits = result.Select(r => r.commits).ToArray()
             }).ToString();
         }
         public async Task<string> RateLimits()

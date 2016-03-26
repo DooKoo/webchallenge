@@ -35,17 +35,27 @@ namespace website.Utils
             return stargazers;
         }
 
-        public static async Task<IEnumerable<Activity>> GetPushes(string name)
+        /// <summary>
+        /// Return commits by period
+        /// </summary>
+        /// <param name="name">name of the repository</param>
+        /// <param name="type">describe period: 0 - weekly commits, 1 - monthly commits</param>
+        /// <returns></returns>
+        public static async Task<IReadOnlyList<GitHubCommit>> GetCommits(string name, int type)
         {
             var splitted = name.Split('/');
 
             if (splitted.Length != 2)
-                return new List<Activity>();
+                return new List<GitHubCommit>();
 
-            var contributors = await GitHubClientSingelton.Client.Activity.Events
-                .GetAllForRepository(splitted[0], splitted[1]);
-            
-            return contributors.Where(c => c.Type == "PushEvent");
+
+            var commits = await GitHubClientSingelton.Client.Repository.Commit.GetAll(splitted[0], splitted[1],
+            new CommitRequest()
+            {
+                Since = type == 0 ? DateTime.Now.AddDays(-7) : DateTime.Now.AddMonths(-1)
+            });
+
+            return commits;
         }
     }
 }

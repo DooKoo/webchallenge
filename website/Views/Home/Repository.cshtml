@@ -38,8 +38,8 @@
         });
     });
 
-    function update(id) {
-        $.getJSON('@Url.Action("GetStargazers", "Api", new {name = Model["FullName"]})&type=' + id, function (data) {
+    function update(type) {
+        $.getJSON('@Url.Action("GetStargazers", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
 
             $('#stars').highcharts({
                 chart: {
@@ -93,7 +93,7 @@
 
                 series: [{
                     type: 'area',
-                    name: 'Stars',
+                    name: 'Зірочок',
                     data: data.stars
                 }]
             });
@@ -151,12 +151,12 @@
 
                 series: [{
                     type: 'area',
-                    name: 'Stars',
+                    name: 'Котриб\'юторів',
                     data: data
                 }]
             });
         });//contributors
-        $.getJSON('@Url.Action("GetCommits", "Api", new {name = Model["FullName"]})&type=' + id, function (data) {
+        $.getJSON('@Url.Action("GetCommits", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
 
             $('#commits').highcharts({
                 chart: {
@@ -210,7 +210,7 @@
 
                 series: [{
                     type: 'area',
-                    name: 'Stars',
+                    name: 'Комітів',
                     data: data.commits
                 }]
             });

@@ -13,7 +13,8 @@ namespace website.Utils
     {
         private static Dictionary<string, Repository> RepositoryDetailsDictionary = new Dictionary<string, Repository>();
         private static Dictionary<string, IReadOnlyList<UserStar>> StargazersDictionary = new Dictionary<string, IReadOnlyList<UserStar>>();
-        private static Dictionary<string, IEnumerable<Activity>> PushesDictionary = new Dictionary<string, IEnumerable<Activity>>();
+        private static Dictionary<string, IReadOnlyList<GitHubCommit>> MonthCommitsDictionary = new Dictionary<string, IReadOnlyList<GitHubCommit>>();
+        private static Dictionary<string, IReadOnlyList<GitHubCommit>> WeekCommitsDictionary = new Dictionary<string, IReadOnlyList<GitHubCommit>>();
         private static JArray Repositories;
 
         public static async Task<JObject> GetRepositoryDetails(string name)
@@ -53,21 +54,36 @@ namespace website.Utils
             return JArray.FromObject(stargazersFiltered);
         }
 
-        public static async Task<JArray> GetPushes(string name, DateTime from, DateTime to)
+        /// <summary>
+        /// return cached commits
+        /// </summary>
+        /// <param name="name">name of the repository</param>
+        /// <param name="type">describe period: 0 - weekly commits, 1 - monthly commits</param>
+        /// <returns></returns>
+        public static async Task<JArray> GetCommits(string name, int type)
         {
-            if (from >= to)
-                return new JArray();
-            
-            if (!PushesDictionary.Keys.Contains(name))
+            Dictionary<string, IReadOnlyList<GitHubCommit>> commitsDictionary;
+
+            if(type == 0)
             {
-                PushesDictionary.Add(name, await GitHubWrapper.GetPushes(name));
+                commitsDictionary = WeekCommitsDictionary;
             }
-            var pushes = PushesDictionary[name];
-            var pushesFiltered = pushes.Where(push =>
-                push.CreatedAt >= from && push.CreatedAt <= to);
-
-            return JArray.FromObject(pushesFiltered);
-
+            else if(type == 1)
+            {
+                commitsDictionary = MonthCommitsDictionary;
+            }
+            else
+            {
+                return new JArray();
+            }
+            
+            if (!commitsDictionary.Keys.Contains(name))
+            {
+                commitsDictionary.Add(name, await GitHubWrapper.GetCommits(name, type));
+            }
+            var commits = commitsDictionary[name];
+            
+            return JArray.FromObject(commits);
         }
     }
 }

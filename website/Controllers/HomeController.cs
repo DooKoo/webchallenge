@@ -62,7 +62,7 @@ namespace website.Controllers
                 var token = await GitHubClientSingelton.Client.Oauth.CreateAccessToken(
                     new OauthTokenRequest(GitHubClientSingelton.ClientId, GitHubClientSingelton.ClientSecret, code)
                     {
-                        RedirectUri = new Uri("http://webchallengeapp.azurewebsites.net/Home/Authorize")
+                        RedirectUri = new Uri("http://localhost:2738/Home/Authorize")
                     });
                 Session["OAuthToken"] = token.AccessToken;
                 GitHubClientSingelton.Client.Credentials = new Credentials(token.AccessToken);
