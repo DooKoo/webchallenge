@@ -35,7 +35,7 @@ namespace website.Controllers
                 repositories.ToList().ForEach(repo =>
                 {
                     var commits = Task.Run(() => CacheService.GetCommits(repo.FullName, period)).Result;
-                    sortDictionary.Add(repo.FullName, commits.GroupBy(c => c.Committer.Id).Count());
+                    sortDictionary.Add(repo.FullName, commits.GroupBy(c => c.Committer != null ? c.Committer.Id : 0).Count());
                 });
             }
             else if (type == 2)
@@ -110,7 +110,7 @@ namespace website.Controllers
                 {
                     date = group.Key,
                     contributors = group.GroupBy(commit =>
-                        commit.Committer.Id).Count()
+                        commit.Author.Id).Count()
                 }).OrderBy(x => DateTime.Parse(x.date));
 
             return JObject.FromObject(new

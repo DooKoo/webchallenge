@@ -2,6 +2,32 @@
 @model JObject
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
+<style type="text/css">
+    .glyphicon-refresh-animate {
+        -animation: spin .7s infinite linear;
+        -webkit-animation: spin2 .7s infinite linear;
+    }
+
+    @@-webkit-keyframes spin2 {
+        from {
+            -webkit-transform: rotate(0deg);
+        }
+
+        to {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes spin {
+        from {
+            transform: scale(1) rotate(0deg);
+        }
+
+        to {
+            transform: scale(1) rotate(360deg);
+        }
+    }
+</style>
 <div>
     <h1 class="page-header"><a href="@Model["HtmlUrl"]">@Model["FullName"]</a></h1>
     <h2><span class="glyphicon glyphicon-star"></span><span>&ensp;@Model["StargazersCount"]</span></h2>
@@ -11,6 +37,10 @@
 <br />
 <br />
 <div class="pull-right" style="padding-right:10px">
+    <div id="loader">
+        <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+        Зачекайте, це займе деякий час...
+    </div>
     Побудувати діаграми за останній @Html.DropDownList("period", new List<SelectListItem>
 {
     new SelectListItem(){
@@ -39,6 +69,8 @@
     });
 
     function update(type) {
+        $('#loader').show();
+        var status = 0;
         //stars
         $.getJSON('@Url.Action("GetStargazers", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
 
@@ -98,6 +130,9 @@
                     data: data.stars
                 }]
             });
+        })
+            .done(function () {
+                loaderChanger();
         });
         //contributors
         $.getJSON('@Url.Action("GetContributors", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
@@ -158,6 +193,9 @@
                     data: data.contributors
                 }]
             });
+        })
+            .done(function () {
+                loaderChanger();
         });
         //commits
         $.getJSON('@Url.Action("GetCommits", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
@@ -218,6 +256,14 @@
                     data: data.commits
                 }]
             });
-        });
+        })
+            .done(function () {
+                loaderChanger();
+            });
+        function loaderChanger() {
+            status += 1;
+            if (status === 3)
+                $('#loader').hide();
+        }
     }
 </script>
