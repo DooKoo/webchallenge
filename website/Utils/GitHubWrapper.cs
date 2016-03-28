@@ -35,6 +35,7 @@ namespace website.Utils
         public static async Task<IReadOnlyList<UserStar>> GetStargazers(string name)
         {
             var splitted = name.Split('/');
+            var limits = await GitHubClientSingelton.Client.Miscellaneous.GetRateLimits();
 
             if (splitted.Length != 2)
                 return new List<UserStar>();

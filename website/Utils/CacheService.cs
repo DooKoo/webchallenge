@@ -145,7 +145,7 @@ namespace website.Utils
                     AddExpirationTime(repository.FullName, typeof(Repository));
                 }
             });
-            var stars = repositories.Select(r => r.StargazersCount).Average();
+            var stars = repositories.Select(r => r.StargazersCount).Sum();
             return repositories;
         }
     }

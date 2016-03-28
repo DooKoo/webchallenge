@@ -39,6 +39,9 @@
                 <span class="alert-danger"> Авторизуйтесь для підвищення лімітів</span>
             </div>
         }
+        <div id="limitAlert">
+            <span class="alert-danger"> Ви вичерпали ліміт запитів, зачекайте деякий час</span>
+        </div>
         @RenderBody()
         <hr />
         <footer>
@@ -47,5 +50,16 @@
     </div>
 
     @RenderSection("scripts", required: false)
+    <script type="text/javascript">
+        $('#limitAlert').hide();
+        $(document).ready(function () {
+            $.ajax('@Url.Action("IsRateLimitsValid", "Api")').done(function (data) {
+                if(data == "False")
+                {
+                    $('#limitAlert').show();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
