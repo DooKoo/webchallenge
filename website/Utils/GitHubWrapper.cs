@@ -10,6 +10,11 @@ namespace website.Utils
 {
     public static class GitHubWrapper
     {
+        /// <summary>
+        /// Return Repository information
+        /// </summary>
+        /// <param name="name">Name of repository</param>
+        /// <returns>Repository</returns>
         public static async Task<Repository> GetRepository(string name)
         {
             var search = new SearchRepositoriesRequest();
@@ -61,5 +66,22 @@ namespace website.Utils
 
             return commits;
         }
+
+        /// <summary>
+        /// Get list of top 50 repositories by stars that was created at last month
+        /// </summary>
+        /// <returns>List of repositories</returns>
+        public static async Task<IReadOnlyList<Repository>> GetRepositories()
+        {
+            var searchRequest = new SearchRepositoriesRequest();
+            searchRequest.Created = DateRange.GreaterThan(DateTime.Now.AddMonths(-1));
+            searchRequest.SortField = RepoSearchSort.Stars;
+            searchRequest.PerPage = 50;
+
+            var requestResult = await GitHubClientSingelton.Client.Search.SearchRepo(searchRequest);
+
+            return requestResult.Items;
+        }
+
     }
 }

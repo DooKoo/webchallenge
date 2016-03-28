@@ -23,7 +23,7 @@ namespace website.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Repositories()
+        public ActionResult Repositories()
         {  
             return View();
         }
@@ -35,8 +35,7 @@ namespace website.Controllers
                 return View("Error");
 
             var repository = await CacheService.GetRepositoryDetails(name);
-            repository.Add("chartType", 0);
-            return View(repository);
+            return View(JObject.FromObject(repository));
         }
 
         [HttpGet]

@@ -1,6 +1,70 @@
-﻿<div id="content"></div>
+﻿<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.11/js/jquery.dataTables.min.js" type="text/javascript"></script>
+<br/>
+<h1>Репозиторії</h1>
+<div class="pull-right">
+    Сортувати по @Html.DropDownList("type", new List<SelectListItem>
+{
+    new SelectListItem(){
+        Text = "зірочкам",
+        Value = "0"
+    },
+    new SelectListItem(){
+            Text = "котриб'юторам",
+            Value = "1"
+    },
+    new SelectListItem(){
+            Text = "комітам",
+            Value = "2"
+    }
+})
+    за
+    @Html.DropDownList("period", new List<SelectListItem>
+{
+    new SelectListItem(){
+        Text = "тиждень",
+        Value = "0"
+    },
+    new SelectListItem(){
+            Text = "місяць",
+            Value = "1"
+    }
+})
+</div>
+<table id="table" class="display" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Назва</th>
+            <th>Опис</th>
+            <th>Мова</th>
+            <th>Зірочок</th>
+        </tr>
+    </thead>
+</table>
+
 <script type="text/javascript">
-    $.ajax('@Url.Action("GetRepositories", "Api")').done(function (data) {
-        $('#content').html(data);
+    $.extend($.fn.dataTable.defaults, {
+        searching: false,
+        ordering: false
     });
+
+    $(document).ready(function () {
+        $('#table').on('click', 'tr', function () {
+            location.href = '@Url.Action("Repository", "Home")' + '?name=' + $('td:first', this).text();
+        });
+    });
+    
+
+    function update(period, type) {
+        $("#table").DataTable({
+            "ajax": "@Url.Action("Repositories", "Api")" + "?period=" + period + "&type=" + type,
+            "language": {
+                "lengthMenu": "Відображати _MENU_ записів на сторінці",
+                "zeroRecords": "Зачекайте будь-ласка, дані в процесі завантаження, це може зайняти суттєвий час.",
+                "info": "Сторінка _PAGE_ з _PAGES_",
+                "infoEmpty": "Немає доступних записів"
+            }
+        });
+    }
+    update(0, 0);
 </script>

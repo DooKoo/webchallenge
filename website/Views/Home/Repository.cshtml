@@ -7,7 +7,7 @@
     <h2><span class="glyphicon glyphicon-star"></span><span>&ensp;@Model["StargazersCount"]</span></h2>
     <h2>Мова: @Model["Language"]</h2>
 </div>
-<br/>
+<br />
 <br />
 <br />
 <div class="pull-right" style="padding-right:10px">
@@ -22,10 +22,10 @@
             Value = "1"
     }
 })
-    <br/>
+    <br />
 </div>
 <div id="stars" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-<br/>
+<br />
 <div id="contributors" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
 <br />
 <div id="commits" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
@@ -39,6 +39,7 @@
     });
 
     function update(type) {
+        //stars
         $.getJSON('@Url.Action("GetStargazers", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
 
             $('#stars').highcharts({
@@ -97,7 +98,8 @@
                     data: data.stars
                 }]
             });
-        });//stars
+        });
+        //contributors
         $.getJSON('@Url.Action("GetContributors", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
 
             $('#contributors').highcharts({
@@ -156,7 +158,8 @@
                     data: data.contributors
                 }]
             });
-        });//contributors
+        });
+        //commits
         $.getJSON('@Url.Action("GetCommits", "Api", new {name = Model["FullName"]})&type=' + type, function (data) {
 
             $('#commits').highcharts({
@@ -215,6 +218,6 @@
                     data: data.commits
                 }]
             });
-        });//commits
+        });
     }
 </script>
