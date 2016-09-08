@@ -24,25 +24,25 @@ namespace website.Controllers
             Dictionary<string, int> sortDictionary = new Dictionary<string, int>();
             if (type == 0)
             {               
-                repositories.ToList().ForEach(repo =>
+                repositories.ToList().ForEach(async repo =>
                 {                    
-                    var stargazers = Task.Run(() => CacheService.GetStargazers(repo.FullName, period)).Result;
+                    var stargazers =  await CacheService.GetStargazers(repo.FullName, period);
                     sortDictionary.Add(repo.FullName, stargazers.Count());
                 });                
             }
             else if (type == 1)
             {
-                repositories.ToList().ForEach(repo =>
+                repositories.ToList().ForEach(async repo =>
                 {
-                    var commits = Task.Run(() => CacheService.GetCommits(repo.FullName, period)).Result;
+                    var commits = await CacheService.GetCommits(repo.FullName, period);
                     sortDictionary.Add(repo.FullName, commits.GroupBy(c => c.Committer != null ? c.Committer.Id : 0).Count());
                 });
             }
             else if (type == 2)
             {
-                repositories.ToList().ForEach(repo =>
+                repositories.ToList().ForEach(async repo =>
                 {
-                    var commits = Task.Run(() => CacheService.GetCommits(repo.FullName, period)).Result;
+                    var commits = await CacheService.GetCommits(repo.FullName, period);
                     sortDictionary.Add(repo.FullName, commits.Count());
                 });
             }
